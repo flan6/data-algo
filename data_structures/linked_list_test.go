@@ -8,7 +8,7 @@ import (
 
 func TestLinkedList(t *testing.T) {
 	// Setup
-	list := ds.NewLinkedList[int]()
+	list := ds.NewLinkedListEval[int]()
 
 	val := []int{0, -10, 69, 420}
 	for i := range val {
@@ -30,11 +30,11 @@ func TestLinkedList(t *testing.T) {
 		}
 	}
 
-	// Preappend
+	// Prepend
 	v := 69420
-	list.Preappend(v)
+	list.Prepend(v)
 	if res, err := list.Get(0); res != v || err != nil {
-		t.Fatalf("Preappend: got %d but expected %d at head", res, v)
+		t.Fatalf("Prepend: got %d but expected %d at head", res, v)
 	}
 
 	// IndexOf
@@ -52,4 +52,26 @@ func TestLinkedList(t *testing.T) {
 	if res, err := list.Get(0); res != v || err != nil {
 		t.Fatalf("Set: got %d but expected %d at head", res, v)
 	}
+}
+
+func FuzzLinkedListEval_RemoveValue(f *testing.F) {
+	values := []string{"test", "fuzz", "random", "tree", "list"}
+	for i := range values {
+		f.Add(values[i])
+	}
+
+	f.Fuzz(func(t *testing.T, a string) {
+		list := ds.NewLinkedListEval[string]()
+		list.Append(a)
+		res, err := list.Get(0)
+		if err != nil || res != a {
+			t.Errorf("%q %v", res, err)
+		}
+
+		list.RemoveValue(a)
+		res, err = list.Get(0)
+		if err != nil || res != "" {
+			t.Errorf("%q %v", res, err)
+		}
+	})
 }
