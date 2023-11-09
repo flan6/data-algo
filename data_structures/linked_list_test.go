@@ -106,10 +106,16 @@ func TestLinkedListEval_RemoveValue(t *testing.T) {
 			expected: []string{"fizz", "buzz"},
 		},
 
-		"item does not exist in list": {
+		"item does not exist": {
 			items:    []string{"fizz", "buzz", "blaus"},
 			toRemove: "flan",
 			expected: []string{"fizz", "buzz", "blaus"},
+		},
+
+		"item exist more than once, should exclude first": {
+			items:    []string{"flan", "flan", "blaus"},
+			toRemove: "flan",
+			expected: []string{"flan", "blaus"},
 		},
 	}
 
