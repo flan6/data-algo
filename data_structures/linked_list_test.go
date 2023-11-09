@@ -1,6 +1,7 @@
 package data_structures_test
 
 import (
+	"math/rand"
 	"testing"
 
 	ds "github.com/flan6/data-algo/data_structures"
@@ -55,23 +56,88 @@ func TestLinkedList(t *testing.T) {
 }
 
 func FuzzLinkedListEval_RemoveValue(f *testing.F) {
-	values := []string{"test", "fuzz", "random", "tree", "list"}
-	for i := range values {
-		f.Add(values[i])
-	}
+	f.Add("test", "fuzz", "random")
+	f.Add("tset", "flan", "modnar")
 
-	f.Fuzz(func(t *testing.T, a string) {
+	f.Fuzz(func(t *testing.T, a, b, c string) {
 		list := ds.NewLinkedListEval[string]()
-		list.Append(a)
-		res, err := list.Get(0)
-		if err != nil || res != a {
-			t.Errorf("%q %v", res, err)
+
+		values := []string{a, b, c}
+		vOccurrences := make(map[string]int)
+		for i := range values {
+			vOccurrences[values[i]]++
+			list.Append(values[i])
+
+			// Assures that append is working
+			res, err := list.Get(uint(i))
+			if err != nil || res != values[i] {
+				t.Errorf("%q %v", res, err)
+			}
 		}
 
-		list.RemoveValue(a)
-		res, err = list.Get(0)
-		if err != nil || res != "" {
-			t.Errorf("%q %v", res, err)
+		vToRemove := values[rand.Intn(2)]
+		list.RemoveValue(vToRemove)
+
+		lOccurrences := make(map[string]int)
+		for i := uint(0); i < list.Length(); i++ {
+			res, err := list.Get(i)
+			if err != nil {
+				t.Errorf("failed to get %v: %v", res, err)
+			}
+
+			lOccurrences[res]++
+		}
+
+		if vOccurrences[vToRemove]-1 != lOccurrences[vToRemove] {
+			t.Errorf("failed to remove %v", vToRemove)
 		}
 	})
+}
+
+func TestLinkedListEval_RemoveValue(t *testing.T) {
+	tests := map[string]struct {
+		items    []string
+		toRemove string
+		expected []string
+	}{
+		"remove last item": {
+			items:    []string{"fizz", "buzz", "blaus"},
+			toRemove: "blaus",
+			expected: []string{"fizz", "buzz"},
+		},
+
+		"item does not exist in list": {
+			items:    []string{"fizz", "buzz", "blaus"},
+			toRemove: "flan",
+			expected: []string{"fizz", "buzz", "blaus"},
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			list := ds.NewLinkedListEval[string]()
+			for i, item := range test.items {
+				list.Append(item)
+
+				// Assures append is working
+				res, err := list.Get(uint(i))
+				if err != nil || res != item {
+					t.Errorf("failed to append item %s got %s: %v", item, res, err)
+				}
+			}
+
+			list.RemoveValue(test.toRemove)
+
+			for i := uint(0); i < list.Length(); i++ {
+				res, err := list.Get(i)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				if res != test.expected[i] {
+					t.Fatalf("unexpected item found %s on list index %d, expected:%v", res, i, test.expected)
+				}
+			}
+		})
+	}
 }
