@@ -2,15 +2,25 @@ package data_structures
 
 import "errors"
 
-type LinkedList[T comparable] struct {
+type List[T any] interface {
+	Length() int
+	InsertAt(index int, item T)
+	Remove(index int) T
+	Append(item T)
+	Prepend(item T)
+	Get(index int) T
+}
+
+type LinkedList[T any] struct {
 	head *node[T]
 	tail *node[T]
 	len  uint
 }
 
-type node[T comparable] struct {
+type node[T any] struct {
 	value T
 	next  *node[T]
+	prev  *node[T]
 }
 
 var ErrIndexOutOfRange = errors.New("index out of range")
@@ -35,42 +45,72 @@ func (l *LinkedList[T]) Append(item T) {
 		return
 	}
 
+	n.prev = l.tail
 	l.tail.next = n
 	l.tail = n
 }
 
-// Preappend inserts item in the begining of the list
-func (l *LinkedList[T]) Preappend(item T) {
+// Prepend inserts item in the begining of the list
+func (l *LinkedList[T]) Prepend(item T) {
 	n := &node[T]{value: item}
 	l.len++
 
 	if l.head == nil {
 		l.head = n
+		l.tail = n
 		return
 	}
 
 	n.next = l.head
+	l.head.prev = n
 	l.head = n
 }
 
 // Get gets the value at index
-func (l *LinkedList[T]) Get(index uint) (T, error) {
+// If list is empty, zero value is returned and nil error
+// Returns ErrIndexOutOfRange in case index does not exist in the list
+func (l LinkedList[T]) Get(index uint) (T, error) {
 	if index > l.len {
 		return *new(T), ErrIndexOutOfRange
+	}
+
+	if index == 0 && l.len == 0 {
+		return *new(T), nil // TODO: should return error empty list?
 	}
 
 	return l.get(index).value, nil
 }
 
-// IndexOf finds the index of value, returns -1 if not found
-func (l LinkedList[T]) IndexOf(value T) int {
-	idx := 0
-	n := l.walk(l.head, value, &idx)
-	if n != nil {
-		return idx
+// InsertAt inserts item at index
+// Returns ErrIndexOutOfRange in case index does not exist in the list
+func (l *LinkedList[T]) InsertAt(index uint, item T) error {
+	if index > l.len {
+		return ErrIndexOutOfRange
 	}
 
-	return -1
+	if index == l.len {
+		l.Append(item)
+		return nil
+	}
+
+	if index == 0 {
+		l.Prepend(item)
+		return nil
+	}
+
+	curr := l.get(index)
+
+	node := &node[T]{
+		value: item,
+		next:  curr,
+		prev:  curr.prev,
+	}
+	curr.prev = node
+	node.prev.next = node
+
+	l.len++
+
+	return nil
 }
 
 // Set sets the new value at index
@@ -80,12 +120,96 @@ func (l *LinkedList[T]) Set(index uint, value T) error {
 		return ErrIndexOutOfRange
 	}
 
+	if index == 0 && l.len == 0 {
+		l.Append(value)
+	}
+
 	l.get(index).value = value
 
 	return nil
 }
 
-func (l LinkedList[T]) walk(n *node[T], value T, index *int) *node[T] {
+// Remove removes the node at index
+// returns ErrIndexOutOfRange in case index does not exist in the list
+func (l *LinkedList[T]) Remove(index uint) error {
+	if index > l.len {
+		return ErrIndexOutOfRange
+	}
+
+	if l.head == nil {
+		return nil
+	}
+
+	curr := l.get(index)
+
+	if curr.next != nil {
+		curr.next.prev = curr.prev
+	}
+
+	if curr.prev != nil {
+		curr.prev.next = curr.next
+	}
+
+	if l.head == curr {
+		l.head = curr.next
+	}
+
+	if l.tail == curr {
+		l.tail = curr.prev
+	}
+
+	curr.prev = nil
+	curr.next = nil
+	l.len--
+
+	return nil
+}
+
+func (l LinkedList[T]) get(index uint) *node[T] {
+	if index == l.len {
+		return l.tail
+	}
+
+	curr := l.head
+	for i := uint(0); i < index && curr != nil; i++ {
+		curr = curr.next
+	}
+
+	return curr
+}
+
+type LinkedListEval[T comparable] struct {
+	LinkedList[T]
+}
+
+func NewLinkedListEval[T comparable]() LinkedListEval[T] {
+	return LinkedListEval[T]{}
+}
+
+// RemoveValue removes the first ocurrence of value
+// No op if not found
+func (l *LinkedListEval[T]) RemoveValue(value T) {
+	// TODO: lazy travels two times the list. must proper implement single traversal later
+	idx := l.IndexOf(value)
+	if idx < 0 {
+		return
+	}
+
+	l.Remove(uint(idx))
+}
+
+// IndexOf finds the index of value, returns -1 if not found
+func (l LinkedListEval[T]) IndexOf(value T) int {
+	idx := 0
+	n := l.walk(l.head, value, &idx)
+	if n != nil {
+		return idx
+	}
+
+	return -1
+}
+
+func (l LinkedListEval[T]) walk(n *node[T], value T, index *int) *node[T] {
 	if n == nil {
 		return nil
 	}
@@ -99,21 +223,4 @@ func (l LinkedList[T]) walk(n *node[T], value T, index *int) *node[T] {
 	}
 
 	return l.walk(n.next, value, index)
-}
-
-func (l LinkedList[T]) get(index uint) *node[T] {
-	if index == 0 {
-		return l.head
-	}
-
-	if index == l.len {
-		return l.tail
-	}
-
-	curr := l.head
-	for i := uint(0); i < index; i++ {
-		curr = curr.next
-	}
-
-	return curr
 }
