@@ -11,7 +11,7 @@ type List[T any] interface {
 	Get(index int) T
 }
 
-type LinkedList[T any] struct {
+type DoubleLinkedList[T any] struct {
 	head *node[T]
 	tail *node[T]
 	len  uint
@@ -25,17 +25,17 @@ type node[T any] struct {
 
 var ErrIndexOutOfRange = errors.New("index out of range")
 
-func NewLinkedList[T comparable]() LinkedList[T] {
-	return LinkedList[T]{}
+func NewLinkedList[T any]() DoubleLinkedList[T] {
+	return DoubleLinkedList[T]{}
 }
 
 // Length returns the current size of the list
-func (l LinkedList[T]) Length() uint {
+func (l DoubleLinkedList[T]) Length() uint {
 	return l.len
 }
 
 // Append inserts item at the end of the list
-func (l *LinkedList[T]) Append(item T) {
+func (l *DoubleLinkedList[T]) Append(item T) {
 	n := &node[T]{value: item}
 	l.len++
 
@@ -51,7 +51,7 @@ func (l *LinkedList[T]) Append(item T) {
 }
 
 // Prepend inserts item in the begining of the list
-func (l *LinkedList[T]) Prepend(item T) {
+func (l *DoubleLinkedList[T]) Prepend(item T) {
 	n := &node[T]{value: item}
 	l.len++
 
@@ -69,7 +69,7 @@ func (l *LinkedList[T]) Prepend(item T) {
 // Get gets the value at index
 // If list is empty, zero value is returned and nil error
 // Returns ErrIndexOutOfRange in case index does not exist in the list
-func (l LinkedList[T]) Get(index uint) (T, error) {
+func (l DoubleLinkedList[T]) Get(index uint) (T, error) {
 	if index > l.len {
 		return *new(T), ErrIndexOutOfRange
 	}
@@ -83,7 +83,7 @@ func (l LinkedList[T]) Get(index uint) (T, error) {
 
 // InsertAt inserts item at index
 // Returns ErrIndexOutOfRange in case index does not exist in the list
-func (l *LinkedList[T]) InsertAt(index uint, item T) error {
+func (l *DoubleLinkedList[T]) InsertAt(index uint, item T) error {
 	if index > l.len {
 		return ErrIndexOutOfRange
 	}
@@ -115,7 +115,7 @@ func (l *LinkedList[T]) InsertAt(index uint, item T) error {
 
 // Set sets the new value at index
 // returns ErrIndexOutOfRange in case index does not exist in the list
-func (l *LinkedList[T]) Set(index uint, value T) error {
+func (l *DoubleLinkedList[T]) Set(index uint, value T) error {
 	if index > l.len {
 		return ErrIndexOutOfRange
 	}
@@ -131,7 +131,7 @@ func (l *LinkedList[T]) Set(index uint, value T) error {
 
 // Remove removes the node at index
 // returns ErrIndexOutOfRange in case index does not exist in the list
-func (l *LinkedList[T]) Remove(index uint) error {
+func (l *DoubleLinkedList[T]) Remove(index uint) error {
 	if index > l.len {
 		return ErrIndexOutOfRange
 	}
@@ -165,7 +165,7 @@ func (l *LinkedList[T]) Remove(index uint) error {
 	return nil
 }
 
-func (l LinkedList[T]) get(index uint) *node[T] {
+func (l DoubleLinkedList[T]) get(index uint) *node[T] {
 	if index == l.len {
 		return l.tail
 	}
@@ -179,7 +179,7 @@ func (l LinkedList[T]) get(index uint) *node[T] {
 }
 
 type LinkedListEval[T comparable] struct {
-	LinkedList[T]
+	DoubleLinkedList[T]
 }
 
 func NewLinkedListEval[T comparable]() LinkedListEval[T] {
@@ -189,7 +189,7 @@ func NewLinkedListEval[T comparable]() LinkedListEval[T] {
 // RemoveValue removes the first ocurrence of value
 // No op if not found
 func (l *LinkedListEval[T]) RemoveValue(value T) {
-	// TODO: lazy travels two times the list. must proper implement single traversal later
+	// TODO: travels two times the list. must proper implement single traversal later
 	idx := l.IndexOf(value)
 	if idx < 0 {
 		return
