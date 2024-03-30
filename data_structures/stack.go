@@ -15,7 +15,7 @@ func (s *Stack[T]) Push(value T) {
 }
 
 func (s *Stack[T]) Pop() T {
-	res := s.data.tail.value
+	res, _ := s.data.Get(s.data.Length() - 1)
 
 	s.data.Remove(s.data.Length())
 
