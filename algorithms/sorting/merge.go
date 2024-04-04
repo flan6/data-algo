@@ -7,41 +7,43 @@ func MergeSort[T ~[]E, E cmp.Ordered](s T) {
 }
 
 func mergeSort[T ~[]E, E cmp.Ordered](s T) {
-	if len(s) > 1 {
-		mid := len(s) / 2
+	if len(s) <= 1 {
+		return
+	}
 
-		left := make(T, mid)
-		right := make(T, mid+len(s)%2)
+	mid := len(s) / 2
 
-		copy(left, s[:mid])
-		copy(right, s[mid:])
+	left := make(T, mid)
+	right := make(T, mid+len(s)%2)
 
-		mergeSort(left)
-		mergeSort(right)
+	copy(left, s[:mid])
+	copy(right, s[mid:])
 
-		i, j, k := 0, 0, 0
+	mergeSort(left)
+	mergeSort(right)
 
-		for i < len(left) && j < len(right) {
-			if left[i] <= right[j] {
-				s[k] = left[i]
-				i++
-			} else {
-				s[k] = right[j]
-				j++
-			}
-			k++
-		}
+	i, j, k := 0, 0, 0
 
-		for i < len(left) {
+	for i < len(left) && j < len(right) {
+		if left[i] <= right[j] {
 			s[k] = left[i]
 			i++
-			k++
-		}
-
-		for j < len(right) {
+		} else {
 			s[k] = right[j]
 			j++
-			k++
 		}
+		k++
+	}
+
+	for i < len(left) {
+		s[k] = left[i]
+		i++
+		k++
+	}
+
+	for j < len(right) {
+		s[k] = right[j]
+		j++
+		k++
 	}
 }
