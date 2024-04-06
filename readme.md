@@ -12,10 +12,14 @@ We aim to leverage Go features the farthest possible, with generics and concurre
     - sorting
         - selection sort
         - bubble sort
+        - merge sort
+        - quick sort
     - recursive maze path find
 - data structures
     - doubly linked list
     - stack
+- visualization
+    - sorting
 
 
 *no brain no gain*
