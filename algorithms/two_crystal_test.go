@@ -14,14 +14,18 @@ type testCase struct {
 func TestTwoCrystalBalls(t *testing.T) {
 	tests := map[string]testCase{
 		"big": {genInput: func() []bool {
-			input := make([]bool, 10000)
+			input := make([]bool, 10)
 
-			for i := 5000; i < 10000; i++ {
+			for i := 5; i < 10; i++ {
 				input[i] = true
 			}
 
 			return input
-		}, expectedIndex: 5000},
+		}, expectedIndex: 5},
+
+		"none": {genInput: func() []bool {
+			return make([]bool, 10)
+		}, expectedIndex: -1},
 	}
 
 	for name, test := range tests {
