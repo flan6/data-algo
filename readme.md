@@ -14,6 +14,10 @@ We aim to leverage Go features the farthest possible, with generics and concurre
         - bubble sort
         - merge sort
         - quick sort
+    - searching
+        - binary
+        - linear
+    - two crystal balls problem
     - recursive maze path find
 - data structures
     - doubly linked list
