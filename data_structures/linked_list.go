@@ -12,15 +12,15 @@ type List[T any] interface {
 }
 
 type DoubleLinkedList[T any] struct {
-	head *node[T]
-	tail *node[T]
+	head *nodeDList[T]
+	tail *nodeDList[T]
 	len  uint
 }
 
-type node[T any] struct {
+type nodeDList[T any] struct {
 	value T
-	next  *node[T]
-	prev  *node[T]
+	next  *nodeDList[T]
+	prev  *nodeDList[T]
 }
 
 var ErrIndexOutOfRange = errors.New("index out of range")
@@ -36,7 +36,7 @@ func (l DoubleLinkedList[T]) Length() uint {
 
 // Append inserts item at the end of the list
 func (l *DoubleLinkedList[T]) Append(item T) {
-	n := &node[T]{value: item}
+	n := &nodeDList[T]{value: item}
 	l.len++
 
 	if l.tail == nil {
@@ -52,7 +52,7 @@ func (l *DoubleLinkedList[T]) Append(item T) {
 
 // Prepend inserts item in the begining of the list
 func (l *DoubleLinkedList[T]) Prepend(item T) {
-	n := &node[T]{value: item}
+	n := &nodeDList[T]{value: item}
 	l.len++
 
 	if l.head == nil {
@@ -100,7 +100,7 @@ func (l *DoubleLinkedList[T]) InsertAt(index uint, item T) error {
 
 	curr := l.get(index)
 
-	node := &node[T]{
+	node := &nodeDList[T]{
 		value: item,
 		next:  curr,
 		prev:  curr.prev,
@@ -165,7 +165,7 @@ func (l *DoubleLinkedList[T]) Remove(index uint) error {
 	return nil
 }
 
-func (l DoubleLinkedList[T]) get(index uint) *node[T] {
+func (l DoubleLinkedList[T]) get(index uint) *nodeDList[T] {
 	if index == l.len {
 		return l.tail
 	}
@@ -209,7 +209,7 @@ func (l LinkedListEval[T]) IndexOf(value T) int {
 	return -1
 }
 
-func (l LinkedListEval[T]) walk(n *node[T], value T, index *int) *node[T] {
+func (l LinkedListEval[T]) walk(n *nodeDList[T], value T, index *int) *nodeDList[T] {
 	if n == nil {
 		return nil
 	}
