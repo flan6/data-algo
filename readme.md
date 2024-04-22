@@ -22,6 +22,8 @@ We aim to leverage Go features the farthest possible, with generics and concurre
 - data structures
     - doubly linked list
     - stack
+    - queue
+    - binary search tree
 - visualization
     - sorting
 
