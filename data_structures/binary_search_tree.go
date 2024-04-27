@@ -5,16 +5,16 @@ import (
 )
 
 type BinarySearchTree[T cmp.Ordered] struct {
-	root *NodeBST[T]
+	root *BSTNode[T]
 }
 
-type NodeBST[T cmp.Ordered] struct {
+type BSTNode[T cmp.Ordered] struct {
 	value T
-	left  *NodeBST[T]
-	right *NodeBST[T]
+	left  *BSTNode[T]
+	right *BSTNode[T]
 }
 
-func (n NodeBST[T]) Value() T {
+func (n BSTNode[T]) Value() T {
 	return n.value
 }
 
@@ -27,9 +27,9 @@ func (b *BinarySearchTree[T]) Insert(val T) {
 	b.root.Insert(val)
 }
 
-func (n *NodeBST[T]) Insert(val T) *NodeBST[T] {
+func (n *BSTNode[T]) Insert(val T) *BSTNode[T] {
 	if n == nil {
-		return &NodeBST[T]{
+		return &BSTNode[T]{
 			value: val,
 		}
 	}
@@ -47,7 +47,7 @@ func (b *BinarySearchTree[T]) Delete(val T) {
 	b.root.Delete(val)
 }
 
-func (n *NodeBST[T]) Delete(val T) *NodeBST[T] {
+func (n *BSTNode[T]) Delete(val T) *BSTNode[T] {
 	if n == nil {
 		return nil
 	}
@@ -82,7 +82,7 @@ func (n *NodeBST[T]) Delete(val T) *NodeBST[T] {
 	return n
 }
 
-func (n *NodeBST[T]) minValue() *NodeBST[T] {
+func (n *BSTNode[T]) minValue() *BSTNode[T] {
 	current := n
 	for current != nil && current.left != nil {
 		current = current.left
@@ -91,22 +91,13 @@ func (n *NodeBST[T]) minValue() *NodeBST[T] {
 	return current
 }
 
-func (n *NodeBST[T]) maxValue() *NodeBST[T] {
-	current := n
-	for current != nil && current.right != nil {
-		current = current.right
-	}
-
-	return current
-}
-
 // Depth First Search
-func (b *BinarySearchTree[T]) Search(val T) (*NodeBST[T], bool) {
+func (b *BinarySearchTree[T]) Search(val T) (*BSTNode[T], bool) {
 	return b.root.Search(val)
 }
 
 // Depth First Search
-func (n *NodeBST[T]) Search(val T) (*NodeBST[T], bool) {
+func (n *BSTNode[T]) Search(val T) (*BSTNode[T], bool) {
 	if n == nil {
 		return nil, false
 	}
@@ -130,7 +121,7 @@ func (b BinarySearchTree[T]) InOrder() []T {
 	return items
 }
 
-func (n *NodeBST[T]) InOrder(items []T) []T {
+func (n *BSTNode[T]) InOrder(items []T) []T {
 	if n == nil {
 		return items
 	}
@@ -149,7 +140,7 @@ func (b BinarySearchTree[T]) PreOrder() []T {
 	return items
 }
 
-func (n *NodeBST[T]) PreOrder(items []T) []T {
+func (n *BSTNode[T]) PreOrder(items []T) []T {
 	// Base case
 	if n == nil {
 		return items
@@ -173,7 +164,7 @@ func (b BinarySearchTree[T]) PostOrder() []T {
 	return items
 }
 
-func (n *NodeBST[T]) PostOrder(items []T) []T {
+func (n *BSTNode[T]) PostOrder(items []T) []T {
 	if n == nil {
 		return items
 	}
