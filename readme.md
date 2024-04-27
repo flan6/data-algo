@@ -24,6 +24,8 @@ We aim to leverage Go features the farthest possible, with generics and concurre
     - stack
     - queue
     - binary search tree
+    - avl tree
+    - weighted graph
 - visualization
     - sorting
 
